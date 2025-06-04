@@ -61,9 +61,7 @@ class PlacePiecesWidget(QDialog):
             return None
 
         else:
-            self.chess.print()
             return None
-        #self.chess.print()
 
     def accept_bt_clicked(self):
         self.parent.tiles_under_attack = self.tiles_under_attack
