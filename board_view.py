@@ -54,7 +54,6 @@ class BoardView(QGraphicsView):
                 self.scene.addItem(rect)
             self.board.append(a)
         self.setScene(self.scene)
-        print(self.board)
 
     def get_board(self):
         return self.board
