@@ -43,11 +43,8 @@ class ShowBoardWidget(QDialog):
         self.board_view = BoardView(parent.board_size, self.place_holder)
         self.tiles = self.board_view.get_board()
 
-        print(self.placed_pieces)
         solution = self.chess.compute(self.amount, 1)
         c1 = ChessSolver(self.size)
-        print(solution)
-        print(self.placed_pieces)
         for i in solution:
             moves = c1.place_piece(i[0], i[1])
             self.tiles[i[0]][i[1]].setBrush(PIECE_AUTO_COLOR)
