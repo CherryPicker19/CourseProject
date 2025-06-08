@@ -16,7 +16,7 @@ from place_pieces_dialog import PlacePiecesWidget
 from show_board_dialog import ShowBoardWidget
 import sys
 
-MAIN_WINDOW_SIZE = QSize(800, 500)
+MAIN_WINDOW_SIZE = QSize(300, 200)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -87,15 +87,16 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def size_inputed(self, text):
-        #print(text)
         if text == "":
             self.board_size_lck = True
         else:
-            numb = int(text)
-            if numb > 20 or numb < 1:
+            num = int(text)
+            if num > 20 or num < 1:
                 self.board_size_lck = True
             else:
-                self.board_size = numb
+                self.board_size = num
+                self.chess = ChessSolver(self.board_size)
+                self.placed_pieces = []
                 self.board_size_lck = False
         self.__unblock_bts()
 
@@ -123,8 +124,6 @@ class MainWindow(QMainWindow):
     def place_pieces_bt_clicked(self):
         wdg = PlacePiecesWidget(self)
         wdg.exec()
-        #print(self.placed_pieces)
-        #print(self.tiles_under_attack)
 
     def show_board_bt_clicked(self):
         solution = self.chess.compute(self.amount, 1)
