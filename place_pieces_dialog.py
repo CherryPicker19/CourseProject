@@ -1,6 +1,4 @@
 from PySide6.QtWidgets import QPushButton, QDialog, QGridLayout, QHBoxLayout, QVBoxLayout
-from PySide6.QtGui import QBrush
-from PySide6.QtCore import Qt
 from chess import ChessSolver
 from board_view import BoardView, PIECE_COLOR, TILE_COLOR, ATTACKED_TILE_COLOR
 
@@ -22,6 +20,7 @@ class PlacePiecesWidget(QDialog):
             self.tiles[i[0]][i[1]].setBrush(PIECE_COLOR)
             for j in moves:
                 self.tiles[j[0]][j[1]].setBrush(ATTACKED_TILE_COLOR)
+                self.tiles[j[0]][j[1]].setEnabled(False)
 
         layout_board = QGridLayout()
         layout_board.addWidget(self.board_view)
@@ -41,21 +40,23 @@ class PlacePiecesWidget(QDialog):
 
     def tile_clicked(self, x, y):
         board = self.chess.board
-        if self.tiles[x][y].is_LMB and (not((x, y) in self.placed_pieces) or not((x,y) in self.tiles_under_attack)):
+        if self.tiles[x][y].is_LMB and (not((x, y) in self.placed_pieces)):
             self.tiles[x][y].setBrush(PIECE_COLOR)
             moves = self.chess.place_piece(x, y)
             self.tiles_under_attack.extend(moves)
             self.placed_pieces.append((x, y))
             for i in moves:
                 self.tiles[i[0]][i[1]].setBrush(ATTACKED_TILE_COLOR)
+                self.tiles[i[0]][i[1]].setEnabled(False)
 
-        elif not self.tiles[x][y].is_LMB and ((x, y) in self.placed_pieces or not (x, y) in self.tiles_under_attack):
+        elif not self.tiles[x][y].is_LMB and ((x, y) in self.placed_pieces):
             self.tiles[x][y].setBrush(TILE_COLOR)
             moves = self.chess.remove_piece(x, y)
             self.placed_pieces.remove((x, y))
             for i in moves:
                 if board[i[0]][i[1]] == 0:
                     self.tiles[i[0]][i[1]].setBrush(TILE_COLOR)
+                    self.tiles[i[0]][i[1]].setEnabled(True)
                     self.tiles_under_attack.remove((i[0], i[1]))
         elif (x, y) in self.tiles_under_attack:
             return None
