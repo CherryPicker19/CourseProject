@@ -9,6 +9,7 @@ from PySide6.QtGui import QBrush
 from PySide6.QtCore import Qt
 from functools import partial
 
+# Constants
 TILE_SIZE = 25
 SPACING = 5
 TILE_COLOR = QBrush(Qt.green)
@@ -18,6 +19,14 @@ ATTACKED_TILE_COLOR = QBrush(Qt.black)
 
 class Tile(QGraphicsRectItem):
     def __init__(self, x, y, width, height, func):
+        """
+        Initializing Tile class.
+        :param x: X coordinate
+        :param y: Y coordinate
+        :param width: Width of a tile
+        :param height: Height of a tile
+        :param func: Function that will be called upon clicking tile
+        """
         super().__init__(x, y, width, height)
         self.setBrush(TILE_COLOR)
         self.is_LMB = None
@@ -25,6 +34,11 @@ class Tile(QGraphicsRectItem):
         self.under_attack = False
 
     def mousePressEvent(self, event, /):
+        """
+        Called upon clicking on the tile. Determines what button was clicked and changes is_LMB parameter if needed.
+        :param event: An instance of QGraphicsSceneMouseEvent
+        :return: None
+        """
         if event.button() == Qt.MouseButton.RightButton:
             self.is_LMB = False
         elif event.button() == Qt.MouseButton.LeftButton:
@@ -34,11 +48,15 @@ class Tile(QGraphicsRectItem):
 
 class BoardView(QGraphicsView):
     def __init__(self, size: int, func):
+        """
+        Initialization of PySide6's QGraphicsView with board and pieces placed on it.
+        :param size: Size of the board
+        :param func: Function that will be called upon user clicking a tile. Have to have first two parameters of x and y coordinates
+        """
         super().__init__()
-
-        self.size = size
+        self.size: int = size
         self.func = func
-        self.scene = QGraphicsScene(self)
+        self.scene: QGraphicsScene = QGraphicsScene(self)
         self.setSizePolicy(
             QSizePolicy.MinimumExpanding,
             QSizePolicy.MinimumExpanding
@@ -54,7 +72,10 @@ class BoardView(QGraphicsView):
             self.board.append(a)
         self.setScene(self.scene)
 
-    def get_board(self):
+    def get_board(self) -> list[list[Tile, ], ]:
+        """
+        :return: Board
+        """
         return self.board
 
 if __name__ == '__main__':
