@@ -5,6 +5,10 @@ from board_view import PIECE_COLOR, ATTACKED_TILE_COLOR, PIECE_AUTO_COLOR, Board
 
 class ShowBoardWidget(QDialog):
     def __init__(self, parent):
+        """
+        Initialization of window with board with first solution.
+        :param parent: Parent class
+        """
         super().__init__(parent)
         self.setWindowTitle("Show Board")
         self.parent = parent
@@ -14,7 +18,7 @@ class ShowBoardWidget(QDialog):
         self.placed_pieces = self.parent.placed_pieces.copy()
         self.tiles_under_attack = self.parent.tiles_under_attack.copy()
 
-        self.board_view = BoardView(parent.board_size, lambda: None)
+        self.board_view = BoardView(parent.board_size, lambda x, y: None)
         self.tiles = self.board_view.get_board()
 
         self.chess.place_pieces(self.placed_pieces)
@@ -56,15 +60,21 @@ class ShowBoardWidget(QDialog):
         self.threadpool = QThreadPool()
 
     def write_bt_clicked(self):
+        """
+        Called upon user clicking write button.
+        :return: None
+        """
         worker = ChessWorker(self.parent.board_size, self.placed_pieces, self.amount)
         self.threadpool.start(worker)
 
-    @staticmethod
-    def place_holder():
-        return None
-
 class ChessWorker(QRunnable):
     def __init__(self, dimensions, placed_pieces, amount):
+        """
+        Initializing worker class, method of which will be executed in other thread.
+        :param dimensions: Size of a board
+        :param placed_pieces: List of placed pieces on a board
+        :param amount: Amount of pieces, that need to be placed
+        """
         super().__init__()
         self.chess = ChessSolver(dimensions)
         for i in placed_pieces:
@@ -73,12 +83,14 @@ class ChessWorker(QRunnable):
 
     @Slot()
     def run(self):
-        #print("Thread Starts")
+        """
+        Called in another thread. Writing chess solutions in a file.
+        :return: None
+        """
         self.chess.compute(self.amount)
-        #print("Thread Stops")
         dlg = QDialog()
         dlg.setFixedSize(300, 70)
-        lb = QLabel("Writing to the file is done")
+        lb = QLabel("Writing to the file is completed")
         lb.setAlignment(Qt.AlignmentFlag.AlignCenter)
         bt1 = QPushButton("Ok")
         bt1.clicked.connect(dlg.close)
