@@ -20,6 +20,9 @@ MAIN_WINDOW_SIZE = QSize(300, 200)
 
 class MainWindow(QMainWindow):
     def __init__(self):
+        """
+        Initialization of main window class.
+        """
         super().__init__()
 
         self.board_size: int
@@ -86,7 +89,12 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(widget)
 
-    def size_inputed(self, text):
+    def size_inputed(self, text: str):
+        """
+        Called upon size text editing.
+        :param text: User input
+        :return: None
+        """
         if text == "":
             self.board_size_lck = True
         else:
@@ -101,6 +109,11 @@ class MainWindow(QMainWindow):
         self.__unblock_bts()
 
     def amount_inputed(self, text):
+        """
+        Called upon amount text editing.
+        :param text: User input
+        :return: None
+        """
         if text == "":
             self.amount_lck = True
         else:
@@ -113,6 +126,10 @@ class MainWindow(QMainWindow):
         self.__unblock_bts()
 
     def __unblock_bts(self):
+        """
+        Called upon size or amount text inputting. Enables or Disables show board and place piece buttons.
+        :return: None
+        """
         if not self.board_size_lck and not self.amount_lck:
             self.place_pieces_bt.setDisabled(False)
             self.show_board_bt.setDisabled(False)
@@ -122,15 +139,24 @@ class MainWindow(QMainWindow):
             self.show_board_bt.setDisabled(True)
 
     def place_pieces_bt_clicked(self):
+        """
+        Called upon place pieces button clicked. Creates a window, where user can place chess pieces.
+        :return: None
+        """
         wdg = PlacePiecesWidget(self)
         wdg.exec()
 
     def show_board_bt_clicked(self):
+        """
+        Called upon show board button clicked. Creates a window, where user can see board with first solution.
+        Creates a window with text: "No solution found" if no solution has been found.
+        :return: None
+        """
         solution = self.chess.compute(self.amount, 1)
         self.chess = ChessSolver(self.board_size)
         for i in self.placed_pieces:
             self.chess.place_piece(i[0],  i[1])
-        if solution is None:
+        if not solution:
             dlg = QDialog()
             dlg.setFixedSize(200, 70)
             lb = QLabel("No solution found")
