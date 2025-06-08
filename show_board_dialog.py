@@ -1,33 +1,7 @@
-from PySide6.QtWidgets import QPushButton, QDialog, QHBoxLayout, QVBoxLayout, QLabel, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QSizePolicy
+from PySide6.QtWidgets import QPushButton, QDialog, QHBoxLayout, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, QRunnable, QThreadPool, Slot
 from chess import ChessSolver
-from board_view import PIECE_COLOR, TILE_COLOR, ATTACKED_TILE_COLOR, TILE_SIZE, PIECE_AUTO_COLOR
-
-
-class BoardView(QGraphicsView):
-    def __init__(self, size: int, func):
-        super().__init__()
-
-        self.size = size
-        self.func = func
-        self.scene = QGraphicsScene(self)
-        self.setSizePolicy(
-            QSizePolicy.MinimumExpanding,
-            QSizePolicy.MinimumExpanding
-        )
-        self.board = []
-        for i in range(size):
-            a = []
-            for j in range(size):
-                rect = QGraphicsRectItem(j*(TILE_SIZE+1), i*(TILE_SIZE+1), TILE_SIZE, TILE_SIZE)
-                rect.setBrush(TILE_COLOR)
-                a.append(rect)
-                self.scene.addItem(rect)
-            self.board.append(a)
-        self.setScene(self.scene)
-
-    def get_board(self):
-        return self.board
+from board_view import PIECE_COLOR, ATTACKED_TILE_COLOR, PIECE_AUTO_COLOR, BoardView
 
 class ShowBoardWidget(QDialog):
     def __init__(self, parent):
@@ -40,12 +14,14 @@ class ShowBoardWidget(QDialog):
         self.placed_pieces = self.parent.placed_pieces.copy()
         self.tiles_under_attack = self.parent.tiles_under_attack.copy()
 
-        self.board_view = BoardView(parent.board_size, self.place_holder)
+        self.board_view = BoardView(parent.board_size, lambda: None)
         self.tiles = self.board_view.get_board()
 
+        self.chess.place_pieces(self.placed_pieces)
         solution = self.chess.compute(self.amount, 1)
+        auto_pieces = list(filter(lambda piece: piece not in self.placed_pieces, solution))
         c1 = ChessSolver(self.size)
-        for i in solution:
+        for i in auto_pieces:
             moves = c1.place_piece(i[0], i[1])
             self.tiles[i[0]][i[1]].setBrush(PIECE_AUTO_COLOR)
             for j in moves:
@@ -56,8 +32,6 @@ class ShowBoardWidget(QDialog):
             self.tiles[i[0]][i[1]].setBrush(PIECE_COLOR)
             for j in moves:
                 self.tiles[j[0]][j[1]].setBrush(ATTACKED_TILE_COLOR)
-
-
 
         # compute and write to file button
         self.write_bt = QPushButton("Write to File")
